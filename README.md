@@ -209,12 +209,53 @@ material3-mcp-server/
 
 ## Roadmap
 
-- [ ] Real GitHub API integration for live component code
-- [ ] Web scraping for m3.material.io documentation
-- [ ] Material Symbols API integration
-- [ ] Cache system for optimized performance
+- [x] Real GitHub API integration for live component code ✅
+- [x] Material Symbols API integration (Iconify JSON) ✅
+- [x] Cache system for optimized performance ✅
+- [x] Unit testing with Vitest ✅
+- [x] CI/CD with GitHub Actions ✅
+- [ ] Web scraping for m3.material.io documentation (optional)
 - [ ] Flutter documentation integration
 - [ ] Figma integration (optional)
+
+## Release & Publishing
+
+This project uses **automated NPM publishing** via GitHub Actions.
+
+### For Maintainers
+
+#### Quick Release
+```bash
+./scripts/release.sh 1.2.0 "New features and improvements"
+```
+
+The script will:
+1. ✅ Update version in `package.json`
+2. ✅ Run tests and build
+3. ✅ Commit and create git tag
+4. ✅ Push to GitHub
+5. ✅ Create GitHub Release
+6. ✅ **Trigger automatic NPM publish via GitHub Actions**
+
+#### Manual Release
+```bash
+# Update version in package.json manually
+git add package.json
+git commit -m "chore: bump version to 1.2.0"
+git tag v1.2.0
+git push && git push --tags
+gh release create v1.2.0 --title "v1.2.0" --notes "Release notes..."
+```
+
+### First-time Setup
+
+To enable automatic NPM publishing, configure the `NPM_TOKEN` secret:
+
+1. Generate NPM token: https://www.npmjs.com/settings/weppa-cloud/tokens (Automation type)
+2. Add to GitHub: https://github.com/weppa-cloud/material3-mcp-server/settings/secrets/actions
+3. Name: `NPM_TOKEN`, Value: your token
+
+See [RELEASE.md](RELEASE.md) for detailed instructions.
 
 ## License
 
