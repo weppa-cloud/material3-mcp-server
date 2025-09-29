@@ -80,36 +80,77 @@ export class DocumentationProvider {
   }
 
   private getMockComponents(category?: string, framework?: string): MaterialComponent[] {
+    // Fallback mock data - matches actual material-components/material-web GitHub repo
     const allComponents: MaterialComponent[] = [
       {
         name: 'button',
         displayName: 'Button',
         category: 'buttons',
         complexity: 'simple',
-        frameworks: ['web', 'flutter', 'react', 'angular'],
+        frameworks: ['web'], // Material Web only supports web framework
         variants: ['filled', 'outlined', 'text', 'elevated', 'tonal'],
         description: 'Buttons help people take action, such as sending an email, sharing a document, or liking a comment.',
         documentationUrl: 'https://m3.material.io/components/buttons'
       },
       {
-        name: 'card',
-        displayName: 'Card',
-        category: 'cards',
-        complexity: 'medium',
-        frameworks: ['web', 'flutter', 'react'],
-        variants: ['elevated', 'filled', 'outlined'],
-        description: 'Cards contain content and actions about a single subject.',
-        documentationUrl: 'https://m3.material.io/components/cards'
-      },
-      {
-        name: 'chip',
-        displayName: 'Chip',
+        name: 'chips',
+        displayName: 'Chips',
         category: 'chips',
         complexity: 'medium',
-        frameworks: ['web', 'flutter', 'react'],
+        frameworks: ['web'], // Material Web only supports web framework
         variants: ['assist', 'filter', 'input', 'suggestion'],
         description: 'Chips help people enter information, make selections, filter content, or trigger actions.',
         documentationUrl: 'https://m3.material.io/components/chips'
+      },
+      {
+        name: 'textfield',
+        displayName: 'Text Field',
+        category: 'text-fields',
+        complexity: 'medium',
+        frameworks: ['web'], // Material Web only supports web framework
+        variants: ['filled', 'outlined'],
+        description: 'Text fields let users enter text into a UI.',
+        documentationUrl: 'https://m3.material.io/components/text-fields'
+      },
+      {
+        name: 'checkbox',
+        displayName: 'Checkbox',
+        category: 'selection',
+        complexity: 'simple',
+        frameworks: ['web'],
+        variants: [],
+        description: 'Checkboxes allow users to select one or more items from a set.',
+        documentationUrl: 'https://m3.material.io/components/checkbox'
+      },
+      {
+        name: 'fab',
+        displayName: 'FAB',
+        category: 'buttons',
+        complexity: 'simple',
+        frameworks: ['web'],
+        variants: ['surface', 'primary', 'secondary', 'tertiary'],
+        description: 'Floating action buttons represent the primary action in an application.',
+        documentationUrl: 'https://m3.material.io/components/floating-action-button'
+      },
+      {
+        name: 'dialog',
+        displayName: 'Dialog',
+        category: 'dialogs',
+        complexity: 'complex',
+        frameworks: ['web'],
+        variants: [],
+        description: 'Dialogs provide important prompts in a user flow.',
+        documentationUrl: 'https://m3.material.io/components/dialogs'
+      },
+      {
+        name: 'list',
+        displayName: 'List',
+        category: 'navigation',
+        complexity: 'complex',
+        frameworks: ['web'],
+        variants: [],
+        description: 'Lists are continuous, vertical indexes of text or images.',
+        documentationUrl: 'https://m3.material.io/components/lists'
       }
     ];
 
@@ -128,14 +169,16 @@ export class DocumentationProvider {
   }
 
   private categorizeComponent(name: string): string {
+    // Updated to match actual material-components/material-web repo structure
     const categories: { [key: string]: string[] } = {
       'buttons': ['button', 'fab', 'iconbutton'],
-      'selection': ['checkbox', 'radio', 'switch', 'slider'],
+      'selection': ['checkbox', 'radio', 'switch', 'slider', 'select'],
       'text-fields': ['textfield', 'field'],
       'chips': ['chips'],
       'navigation': ['tabs', 'menu', 'list'],
       'dialogs': ['dialog'],
-      'progress': ['progress']
+      'progress': ['progress'],
+      'dividers': ['divider']
     };
 
     for (const [category, keywords] of Object.entries(categories)) {

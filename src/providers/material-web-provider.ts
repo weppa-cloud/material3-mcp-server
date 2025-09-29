@@ -110,15 +110,17 @@ export class MaterialWebProvider {
           throw new Error('Expected array of contents');
         }
 
-        // Filter directories that are likely components
+        // Filter directories that are actual Material 3 components
+        // Based on actual material-components/material-web repo structure
         const components = contents
           .filter(item => item.type === 'dir')
           .filter(item => {
-            // Exclude non-component directories
+            // Exclude non-component directories (utilities, infrastructure, etc.)
             const excluded = [
               'docs', 'scripts', 'testing', 'internal', 'catalog',
-              'color', 'elevation', 'focus', 'ripple', 'tokens',
-              'typography', 'labs', 'migrations', '.github'
+              'elevation', 'focus', 'ripple', 'tokens',
+              'typography', 'labs', 'migrations', '.github',
+              'field', 'icon', 'color' // These are primitives/internals, not standalone components
             ];
             return !excluded.includes(item.name) && !item.name.startsWith('.');
           })

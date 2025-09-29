@@ -17,6 +17,25 @@ export async function getComponentCode(args: z.infer<typeof inputSchema>) {
   try {
     logger.info('get_component_code called', args);
 
+    // Currently only Web Components are supported via GitHub API
+    // Flutter, React, Angular require different data sources
+    if (args.framework !== 'web') {
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            error: 'Framework not yet supported',
+            message: `Currently only 'web' framework is supported via GitHub API (material-components/material-web). Flutter, React, and Angular support is planned for future releases.`,
+            requested_framework: args.framework,
+            available_framework: 'web',
+            suggestion: `Try requesting the component with framework: 'web' to get Material Web Components code.`,
+            roadmap: 'Flutter support requires integration with Flutter Material documentation or pub.dev packages.'
+          }, null, 2)
+        }],
+        isError: true
+      };
+    }
+
     const provider = new MaterialWebProvider();
     const componentCode = await provider.getComponentCode(args.componentName, args.variant);
 
