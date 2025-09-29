@@ -1,5 +1,9 @@
 # Material 3 MCP Server
 
+[![CI](https://github.com/weppa-cloud/material3-mcp-server/workflows/CI/badge.svg)](https://github.com/weppa-cloud/material3-mcp-server/actions)
+[![npm version](https://badge.fury.io/js/@weppa-cloud%2Fmaterial3-mcp-server.svg)](https://www.npmjs.com/package/@weppa-cloud/material3-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 MCP server providing AI agents with convenient access to Material 3 design system components, design tokens, icons, and accessibility guidelines across multiple frameworks.
 
 ## Features
