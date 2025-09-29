@@ -1,0 +1,11 @@
+src/
+scripts/
+tests/
+.env
+.env.example
+*.log
+.DS_Store
+tsconfig.json
+.gitignore
+*.md
+!README.md
