@@ -29,6 +29,14 @@ import {
   manageCacheHealth,
   manageCacheHealthSchema
 } from './tools/manageCacheHealth.js';
+import {
+  generateThemeFromColor,
+  generateThemeFromColorSchema
+} from './tools/generateThemeFromColor.js';
+import {
+  suggestComponentsForUseCase,
+  suggestComponentsForUseCaseSchema
+} from './tools/suggestComponentsForUseCase.js';
 
 // Load environment variables
 import dotenv from 'dotenv';
@@ -115,7 +123,29 @@ async function main() {
     manageCacheHealth
   );
 
-  logger.info('Registered 6 MCP tools');
+  // Register Tool 7: generate_theme_from_color
+  server.registerTool(
+    'generate_theme_from_color',
+    {
+      title: 'Generate Theme from Color',
+      description: 'Generate complete Material 3 color palette from a single base color',
+      inputSchema: generateThemeFromColorSchema.shape
+    },
+    generateThemeFromColor
+  );
+
+  // Register Tool 8: suggest_components_for_use_case
+  server.registerTool(
+    'suggest_components_for_use_case',
+    {
+      title: 'Suggest Components for Use Case',
+      description: 'Get AI-powered component suggestions based on use case description',
+      inputSchema: suggestComponentsForUseCaseSchema.shape
+    },
+    suggestComponentsForUseCase
+  );
+
+  logger.info('Registered 8 MCP tools');
 
   // Connect via stdio transport
   const transport = new StdioServerTransport();

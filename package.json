@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@iconify-json/material-symbols": "^1.2.39",
+    "@material/material-color-utilities": "^0.3.0",
     "@modelcontextprotocol/sdk": "^1.18.1",
     "@typescript-eslint/typescript-estree": "^8.45.0",
     "axios": "^1.6.0",
