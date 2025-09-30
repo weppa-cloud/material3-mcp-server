@@ -25,13 +25,23 @@ import {
   getAccessibilityGuidelines,
   getAccessibilityGuidelinesSchema
 } from './tools/getAccessibilityGuidelines.js';
+import {
+  manageCacheHealth,
+  manageCacheHealthSchema
+} from './tools/manageCacheHealth.js';
 
 // Load environment variables
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Import cache versioning
+import { cacheVersionManager } from './utils/cache-versioning.js';
+
 async function main() {
   logger.info('Starting Material 3 MCP Server');
+
+  // Check cache version and upstream changes on startup
+  await cacheVersionManager.checkCacheVersion();
 
   // Create MCP server
   const server = new McpServer({
@@ -94,7 +104,18 @@ async function main() {
     getAccessibilityGuidelines
   );
 
-  logger.info('Registered 5 MCP tools');
+  // Register Tool 6: manage_cache_health
+  server.registerTool(
+    'manage_cache_health',
+    {
+      title: 'Manage Cache Health',
+      description: 'Check cache status, verify upstream changes, and invalidate stale data',
+      inputSchema: manageCacheHealthSchema.shape
+    },
+    manageCacheHealth
+  );
+
+  logger.info('Registered 6 MCP tools');
 
   // Connect via stdio transport
   const transport = new StdioServerTransport();
