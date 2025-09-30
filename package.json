@@ -1,6 +1,6 @@
 {
   "name": "@weppa-cloud/material3-mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP server for Material 3 design system - provides AI agents with access to components, themes, and design tokens",
   "type": "module",
   "main": "./build/index.js",
