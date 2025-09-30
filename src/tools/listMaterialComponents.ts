@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { DocumentationProvider } from '../providers/documentation-provider.js';
 import { logger } from '../utils/logger.js';
 import { ErrorHandler } from '../utils/error-handler.js';
+import { userConfig } from '../config/user-config.js';
 
 const inputSchema = z.object({
   category: z.enum([
@@ -10,7 +11,7 @@ const inputSchema = z.object({
     'sliders', 'text-fields', 'all'
   ]).optional().default('all'),
   complexity: z.enum(['simple', 'medium', 'complex', 'all']).optional().default('all'),
-  framework: z.enum(['web', 'flutter', 'react', 'angular', 'all']).optional().default('all'),
+  framework: z.enum(['web', 'flutter', 'react', 'angular', 'all']).optional().default('flutter').describe("Target framework (default: 'flutter'). Use 'all' to see components from all frameworks."),
   includeDeprecated: z.boolean().optional().default(false)
 });
 
@@ -19,9 +20,15 @@ export async function listMaterialComponents(args: z.infer<typeof inputSchema>) 
     logger.info('list_material_components called', args);
 
     const provider = new DocumentationProvider();
+
+    // Use user config default if not specified, but allow 'all' to override
+    const framework = args.framework === 'flutter' && args.framework === userConfig.getDefaultFramework()
+      ? args.framework
+      : (args.framework === 'all' ? undefined : args.framework);
+
     let components = await provider.getComponents(
       args.category === 'all' ? undefined : args.category,
-      args.framework === 'all' ? undefined : args.framework
+      framework
     );
 
     // Filter by complexity

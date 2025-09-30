@@ -1,6 +1,7 @@
 import { logger } from '../utils/logger.js';
 import { githubClient } from '../utils/http-client.js';
-import { componentCache } from '../utils/cache.js';
+import { persistentComponentCache } from '../utils/persistent-cache.js';
+import { userConfig } from '../config/user-config.js';
 import type { ComponentCode } from '../types/material-component.js';
 
 interface GitHubContent {
