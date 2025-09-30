@@ -48,9 +48,9 @@ export class MaterialWebProvider {
   }
 
   async getComponentCode(componentName: string, variant?: string): Promise<ComponentCode> {
-    const cacheKey = `component:${componentName}:${variant || 'default'}`;
+    const cacheKey = `web:${componentName}:${variant || 'default'}`;
 
-    return componentCache.wrap(cacheKey, async () => {
+    return persistentComponentCache.wrap(cacheKey, async () => {
       try {
         logger.info(`Fetching component code for: ${componentName}${variant ? ` (${variant})` : ''}`);
 
@@ -127,7 +127,7 @@ export class MaterialWebProvider {
   }
 
   async listComponents(): Promise<string[]> {
-    return componentCache.wrap('components:list', async () => {
+    return persistentComponentCache.wrap('web:components:list', async () => {
       try {
         logger.info('Listing Material Web components from GitHub');
 
@@ -163,7 +163,7 @@ export class MaterialWebProvider {
         logger.error('Failed to list components', error);
         throw new Error(`Failed to fetch component list: ${error.message}`);
       }
-    }, 3600); // Cache for 1 hour
+    }, userConfig.getCacheTTL('components'));
   }
 
   private extractImports(sourceCode: string): string[] {

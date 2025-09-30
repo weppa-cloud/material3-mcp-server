@@ -3,6 +3,7 @@ import { MaterialWebProvider } from '../providers/material-web-provider.js';
 import { FlutterMaterialProvider } from '../providers/flutter-material-provider.js';
 import { logger } from '../utils/logger.js';
 import { isValidComponentName } from '../utils/validators.js';
+import { userConfig } from '../config/user-config.js';
 
 const inputSchema = z.object({
   componentName: z.string().describe("Component name (e.g., 'button', 'card')").refine(isValidComponentName, {
@@ -38,8 +39,8 @@ export async function getComponentCode(args: z.infer<typeof inputSchema>) {
       };
     }
 
-    // Select appropriate provider based on framework (defaults to flutter per schema)
-    const framework = args.framework || 'flutter';
+    // Select appropriate provider based on framework (defaults to user config)
+    const framework = args.framework || userConfig.getDefaultFramework();
     let componentCode;
 
     if (framework === 'flutter') {

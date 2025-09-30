@@ -9,6 +9,29 @@ export interface MaterialComponent {
   documentationUrl: string;
 }
 
+export interface ComponentMetadata {
+  properties?: Array<{
+    name: string;
+    type: string;
+    required: boolean;
+    defaultValue?: string;
+    description?: string;
+  }>;
+  methods?: Array<{
+    name: string;
+    returnType: string;
+    parameters: Array<{
+      name: string;
+      type: string;
+      required: boolean;
+    }>;
+    description?: string;
+  }>;
+  events?: string[];
+  className?: string;
+  description?: string;
+}
+
 export interface ComponentCode {
   component: string;
   framework: string;
@@ -19,6 +42,8 @@ export interface ComponentCode {
   imports: string[];
   cssVariables?: string[];
   documentation: string;
+  metadata?: ComponentMetadata;
+  availableVariants?: string[];
 }
 
 export interface CodeExample {

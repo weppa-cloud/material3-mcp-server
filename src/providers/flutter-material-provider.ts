@@ -1,6 +1,8 @@
 import { logger } from '../utils/logger.js';
 import { githubClient } from '../utils/http-client.js';
-import { componentCache } from '../utils/cache.js';
+import { persistentComponentCache } from '../utils/persistent-cache.js';
+import { userConfig } from '../config/user-config.js';
+import { dartMetadataParser } from '../parsers/dart-metadata-parser.js';
 import type { ComponentCode } from '../types/material-component.js';
 
 interface GitHubContent {
@@ -33,7 +35,7 @@ export class FlutterMaterialProvider {
   async getComponentCode(componentName: string, variant?: string): Promise<ComponentCode> {
     const cacheKey = `flutter:${componentName}:${variant || 'default'}`;
 
-    return componentCache.wrap(cacheKey, async () => {
+    return persistentComponentCache.wrap(cacheKey, async () => {
       try {
         logger.info(`Fetching Flutter component code for: ${componentName}${variant ? ` (${variant})` : ''}`);
 
@@ -54,13 +56,43 @@ export class FlutterMaterialProvider {
         // Decode base64 content
         const sourceCode = Buffer.from(fileData.content, 'base64').toString('utf-8');
 
-        // Extract metadata from Dart code
+        // Extract metadata from Dart code using AST parser
+        const dartMetadata = dartMetadataParser.parse(sourceCode);
+        const primaryWidget = dartMetadataParser.extractPrimaryWidget(sourceCode);
+
+        // Fallback to regex-based extraction
         const imports = this.extractImports(sourceCode);
         const classNames = this.extractClassNames(sourceCode);
         const variants = this.inferVariants(componentName);
 
         // Generate usage examples
         const examples = this.generateExamples(componentName, variant, classNames[0]);
+
+        // Build structured metadata
+        const metadata = primaryWidget ? {
+          className: primaryWidget.name,
+          description: primaryWidget.description,
+          properties: primaryWidget.properties.map(prop => ({
+            name: prop.name,
+            type: prop.type,
+            required: prop.required,
+            defaultValue: prop.defaultValue,
+            description: prop.description
+          })),
+          methods: primaryWidget.methods.map(method => ({
+            name: method.name,
+            returnType: method.returnType,
+            parameters: method.parameters.map(param => ({
+              name: param.name,
+              type: param.type,
+              required: param.required
+            })),
+            description: method.description
+          })),
+          events: primaryWidget.methods
+            .filter(m => m.name.startsWith('on'))
+            .map(m => m.name)
+        } : undefined;
 
         return {
           component: componentName,
@@ -73,6 +105,7 @@ export class FlutterMaterialProvider {
           cssVariables: [], // Flutter uses theme properties, not CSS
           documentation: `https://api.flutter.dev/flutter/material/${classNames[0]}-class.html`,
           availableVariants: variants,
+          metadata
         };
       } catch (error: any) {
         logger.error(`Failed to fetch Flutter component code: ${componentName}`, error);
@@ -292,7 +325,7 @@ class MyWidget extends StatelessWidget {
    * Lists all available Flutter Material components
    */
   async listComponents(): Promise<string[]> {
-    return componentCache.wrap('flutter:components:list', async () => {
+    return persistentComponentCache.wrap('flutter:components:list', async () => {
       try {
         logger.info('Listing Flutter Material components from GitHub');
 
@@ -333,7 +366,7 @@ class MyWidget extends StatelessWidget {
         logger.error('Failed to list Flutter components', error);
         throw new Error(`Failed to fetch Flutter component list: ${error.message}`);
       }
-    }, 3600); // Cache for 1 hour
+    }, userConfig.getCacheTTL('components'));
   }
 }
 

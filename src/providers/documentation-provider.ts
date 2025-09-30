@@ -1,7 +1,8 @@
 import * as cheerio from 'cheerio';
 import { logger } from '../utils/logger.js';
 import { webClient } from '../utils/http-client.js';
-import { docsCache } from '../utils/cache.js';
+import { persistentDocsCache } from '../utils/persistent-cache.js';
+import { userConfig } from '../config/user-config.js';
 import { MaterialWebProvider } from './material-web-provider.js';
 import { FlutterMaterialProvider } from './flutter-material-provider.js';
 import type { MaterialComponent, DesignToken, MaterialIcon, AccessibilityGuideline } from '../types/material-component.js';
@@ -93,7 +94,7 @@ export class DocumentationProvider {
   }
 
   private async getComponentsFromWeb(category?: string, framework?: string): Promise<MaterialComponent[]> {
-    return docsCache.wrap(`components:web:${category}:${framework}`, async () => {
+    return persistentDocsCache.wrap(`components:web:${category}:${framework}`, async () => {
       try {
         logger.info('Scraping components from m3.material.io');
 
@@ -112,7 +113,7 @@ export class DocumentationProvider {
         logger.error('Failed to scrape components', error);
         return this.getMockComponents(category, framework);
       }
-    }, 43200); // Cache for 12 hours
+    }, userConfig.getCacheTTL('docs'));
   }
 
   private getMockComponents(category?: string, framework?: string): MaterialComponent[] {
