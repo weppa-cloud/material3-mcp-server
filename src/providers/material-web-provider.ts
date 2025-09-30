@@ -20,6 +20,32 @@ interface GitHubContent {
 export class MaterialWebProvider {
   private readonly repoPath = 'repos/material-components/material-web';
 
+  /**
+   * Check and log GitHub API rate limit status
+   */
+  private checkRateLimitStatus(response: any): void {
+    const remaining = parseInt(response.headers?.['x-ratelimit-remaining'] || '999999');
+    const limit = parseInt(response.headers?.['x-ratelimit-limit'] || '999999');
+    const reset = response.headers?.['x-ratelimit-reset'];
+
+    if (limit === 999999) return; // No rate limit headers present
+
+    const percentageUsed = ((limit - remaining) / limit) * 100;
+
+    // Warn at 80% consumption
+    if (percentageUsed >= 80) {
+      const resetDate = reset ? new Date(parseInt(reset) * 1000).toLocaleString() : 'unknown';
+
+      logger.warn('GitHub API rate limit warning', {
+        remaining,
+        limit,
+        percentageUsed: Math.round(percentageUsed),
+        resetTime: resetDate,
+        suggestion: remaining < 10 ? 'CRITICAL: Set GITHUB_TOKEN environment variable to increase limit to 5,000/hour' : 'Consider setting GITHUB_TOKEN for higher limits'
+      });
+    }
+  }
+
   async getComponentCode(componentName: string, variant?: string): Promise<ComponentCode> {
     const cacheKey = `component:${componentName}:${variant || 'default'}`;
 
@@ -31,6 +57,9 @@ export class MaterialWebProvider {
         const dirResponse = await githubClient.get<GitHubContent[]>(
           `/${this.repoPath}/contents/${componentName}`
         );
+
+        // Check rate limit after GitHub API call
+        this.checkRateLimitStatus(dirResponse);
 
         const files = dirResponse.data;
         if (!Array.isArray(files)) {

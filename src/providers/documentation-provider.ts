@@ -3,15 +3,18 @@ import { logger } from '../utils/logger.js';
 import { webClient } from '../utils/http-client.js';
 import { docsCache } from '../utils/cache.js';
 import { MaterialWebProvider } from './material-web-provider.js';
+import { FlutterMaterialProvider } from './flutter-material-provider.js';
 import type { MaterialComponent, DesignToken, MaterialIcon, AccessibilityGuideline } from '../types/material-component.js';
 
 export class DocumentationProvider {
   private readonly baseUrl = 'https://m3.material.io';
   private materialWebProvider: MaterialWebProvider;
+  private flutterMaterialProvider: FlutterMaterialProvider;
   private useWebScraping: boolean;
 
   constructor(useWebScraping: boolean = false) {
     this.materialWebProvider = new MaterialWebProvider();
+    this.flutterMaterialProvider = new FlutterMaterialProvider();
     this.useWebScraping = useWebScraping;
   }
 
@@ -29,19 +32,52 @@ export class DocumentationProvider {
 
   private async getComponentsFromGitHub(category?: string, framework?: string): Promise<MaterialComponent[]> {
     try {
-      const componentNames = await this.materialWebProvider.listComponents();
+      // Fetch components from both providers
+      const [webComponentNames, flutterComponentNames] = await Promise.all([
+        this.materialWebProvider.listComponents(),
+        this.flutterMaterialProvider.listComponents()
+      ]);
 
-      // Map component names to MaterialComponent format
-      const components: MaterialComponent[] = componentNames.map(name => ({
-        name,
-        displayName: this.toDisplayName(name),
-        category: this.categorizeComponent(name),
-        complexity: this.estimateComplexity(name),
-        frameworks: ['web'], // Material Web only supports web
-        variants: [], // Would need to fetch individual component to get variants
-        description: `Material 3 ${this.toDisplayName(name)} component`,
-        documentationUrl: `https://m3.material.io/components/${name}`
-      }));
+      // Create a map to merge components by name
+      const componentMap = new Map<string, MaterialComponent>();
+
+      // Add web components
+      webComponentNames.forEach(name => {
+        componentMap.set(name, {
+          name,
+          displayName: this.toDisplayName(name),
+          category: this.categorizeComponent(name),
+          complexity: this.estimateComplexity(name),
+          frameworks: ['web'],
+          variants: [],
+          description: `Material 3 ${this.toDisplayName(name)} component`,
+          documentationUrl: `https://m3.material.io/components/${name}`
+        });
+      });
+
+      // Add flutter components (merge if already exists)
+      flutterComponentNames.forEach(name => {
+        const existing = componentMap.get(name);
+        if (existing) {
+          // Component exists in both frameworks
+          existing.frameworks.push('flutter');
+        } else {
+          // Flutter-only component
+          componentMap.set(name, {
+            name,
+            displayName: this.toDisplayName(name),
+            category: this.categorizeComponent(name),
+            complexity: this.estimateComplexity(name),
+            frameworks: ['flutter'],
+            variants: [],
+            description: `Material 3 ${this.toDisplayName(name)} component`,
+            documentationUrl: `https://m3.material.io/components/${name}`
+          });
+        }
+      });
+
+      // Convert map to array
+      const components = Array.from(componentMap.values());
 
       // Filter by category and framework
       return components.filter(comp => {

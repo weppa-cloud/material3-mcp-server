@@ -30,7 +30,8 @@ export async function searchMaterialIcons(args: z.infer<typeof inputSchema>) {
         web: provider.generateUsageCode(icon.name, 'web'),
         react: provider.generateUsageCode(icon.name, 'react'),
         angular: provider.generateUsageCode(icon.name, 'angular'),
-        vue: provider.generateUsageCode(icon.name, 'vue')
+        vue: provider.generateUsageCode(icon.name, 'vue'),
+        flutter: provider.generateUsageCode(icon.name, 'flutter')
       }
     }));
 

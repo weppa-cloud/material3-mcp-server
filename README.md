@@ -9,26 +9,43 @@ MCP server providing AI agents with convenient access to Material 3 design syste
 ## Features
 
 - **5 Essential Tools** for Material 3 development
-- **Multi-framework support**: Web Components, Flutter, React, Angular
+- **Multi-framework support**:
+  - ✅ **Web Components** (Material Web - fully supported)
+  - ✅ **Flutter** (Flutter Material - fully supported)
+  - 🔜 React, Angular (coming soon)
 - **Accessibility-first**: WCAG 2.1 guidelines for every component
 - **Design tokens**: Export in CSS, SCSS, JSON, or JavaScript
 - **Icon search**: Access to 2,500+ Material Symbols
 
-## Installation
+## Quick Start
 
-### NPM (Recommended)
+### 📚 Documentation
+
+- **[Getting Started Guide](docs/getting-started.md)** - Complete setup in < 5 minutes
+- **[API Reference](docs/api-reference.md)** - Detailed tool documentation
+- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
+- **[Usage Examples](docs/examples.md)** - Real-world workflows
+
+### Installation
+
+#### NPM (Recommended)
 
 ```bash
 npm install -g @weppa-cloud/material3-mcp-server
 ```
 
-### From Source
+#### From Source
 
 ```bash
 git clone <repository-url>
 cd material3-mcp-server
 npm install
 npm run build
+```
+
+**Verify installation:**
+```bash
+./scripts/test-package.sh
 ```
 
 ## Configuration
@@ -99,16 +116,23 @@ List Material 3 components with filters.
 Get real source code for Material 3 components.
 
 **Parameters:**
-- `componentName`: Component name (e.g., 'button', 'card')
-- `framework` (optional): web, flutter, react, angular (default: web)
-- `variant` (optional): Variant name (e.g., 'filled', 'outlined')
+- `componentName`: Component name (e.g., 'button', 'card', 'text-field')
+- `framework` (optional): web, flutter (default: **flutter**). React and Angular coming soon.
+- `variant` (optional): Variant name (e.g., 'filled', 'outlined', 'elevated')
 - `includeExamples` (optional): boolean (default: true)
 - `includeDependencies` (optional): boolean (default: true)
 
+**Supported Frameworks:**
+- ✅ **Flutter**: Fetches Dart code from `flutter/flutter` GitHub repo
+- ✅ **Web**: Fetches TypeScript/JavaScript from `material-components/material-web` repo
+- 🔜 React, Angular: Planned for future releases
+
 **Example usage:**
 ```
-"Get code for a Material 3 filled button in Flutter"
-"Show me the card component code for React"
+"Get code for a Material 3 button" → Returns Flutter code (default)
+"Get code for an elevated button in Flutter"
+"Show me the card component code for web"
+"Get outlined button code for Flutter with examples"
 ```
 
 ### 3. get_design_tokens
@@ -160,8 +184,20 @@ Get WCAG 2.1 accessibility guidelines for components.
 
 ## Environment Variables
 
+### Core Settings
 - `GITHUB_TOKEN` (optional): GitHub personal access token for higher API rate limits (5,000/hour vs 60/hour)
 - `LOG_LEVEL` (optional): DEBUG, INFO, WARN, ERROR (default: INFO)
+
+### Web Scraping (Future Feature)
+The following environment variables will be used for the upcoming web scraping feature (see `PRPs/web-scraping-quick-wins.md`):
+
+- `ENABLE_WEB_SCRAPING` (optional): Enable web scraping from m3.material.io (default: false)
+- `WEB_SCRAPING_RATE_LIMIT` (optional): Maximum requests per second for web scraping (default: 10)
+- `HTTP_TIMEOUT` (optional): HTTP request timeout in milliseconds (default: 5000)
+- `HTTP_RETRY_ATTEMPTS` (optional): Number of retry attempts for failed requests (default: 3)
+- `CACHE_TTL` (optional): Cache time-to-live in seconds (default: 3600)
+- `CACHE_CHECK_PERIOD` (optional): Cache cleanup interval in seconds (default: 600)
+- `MIN_COMPONENTS_THRESHOLD` (optional): Minimum number of components for healthy cache (default: 15)
 
 ## Development
 

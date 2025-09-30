@@ -141,7 +141,7 @@ export class MaterialSymbolsProvider {
     };
   }
 
-  generateUsageCode(iconName: string, framework: 'web' | 'react' | 'angular' | 'vue' = 'web'): string {
+  generateUsageCode(iconName: string, framework: 'web' | 'react' | 'angular' | 'vue' | 'flutter' = 'web'): string {
     switch (framework) {
       case 'web':
         return `<!-- Using Google Fonts -->
@@ -172,6 +172,28 @@ function MyComponent() {
     ${iconName.replace(/-/g, '_')}
   </span>
 </template>`;
+
+      case 'flutter':
+        return `// Using Material Icons (included in Flutter SDK)
+import 'package:flutter/material.dart';
+
+// Basic usage
+Icon(Icons.${this.toFlutterIconName(iconName)})
+
+// With customization
+Icon(
+  Icons.${this.toFlutterIconName(iconName)},
+  size: 24.0,
+  color: Colors.blue,
+)
+
+// In a widget
+IconButton(
+  icon: Icon(Icons.${this.toFlutterIconName(iconName)}),
+  onPressed: () {
+    // Handle press
+  },
+)`;
 
       default:
         return `Icon: ${iconName}`;
@@ -217,6 +239,15 @@ function MyComponent() {
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join('');
+  }
+
+  /**
+   * Converts icon name to Flutter Icons class naming convention
+   * Examples: 'home' -> 'home', 'arrow-back' -> 'arrow_back', 'add-circle' -> 'add_circle'
+   */
+  private toFlutterIconName(iconName: string): string {
+    // Flutter uses snake_case for icon names in the Icons class
+    return iconName.replace(/-/g, '_');
   }
 
   getStats(): {

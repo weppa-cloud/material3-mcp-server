@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DocumentationProvider } from '../providers/documentation-provider.js';
 import { logger } from '../utils/logger.js';
+import { ErrorHandler } from '../utils/error-handler.js';
 
 const inputSchema = z.object({
   category: z.enum([
@@ -45,14 +46,11 @@ export async function listMaterialComponents(args: z.infer<typeof inputSchema>) 
       }]
     };
   } catch (error: any) {
-    logger.error('list_material_components failed', error);
-    return {
-      content: [{
-        type: 'text' as const,
-        text: `Error: ${error.message}`
-      }],
-      isError: true
-    };
+    return ErrorHandler.handleAndFormat({
+      tool: 'list_material_components',
+      operation: `list components (category: ${args.category}, framework: ${args.framework})`,
+      error
+    });
   }
 }
 
